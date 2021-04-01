@@ -8,5 +8,10 @@ go_binary {
   // Build inputs.
   srcs: ["**/*.go", "../go.mod"],
 
-  //testPkg: "github.com/burbokop/design-practice-1/build/modules/gomodule"
+  testPkg: "github.com/burbokop/design-practice-1/build/modules/gomodule"
+}
+
+zip_archive {
+  name: "arch1",
+  files: ["**/*.go"]
 }

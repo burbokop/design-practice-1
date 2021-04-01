@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/burbokop/design-practice-1/build/gomodule"
+	"github.com/burbokop/design-practice-1/build/modules/gomodule"
 	"github.com/google/blueprint"
 	"github.com/roman-mazur/bood"
 )
