@@ -1,0 +1,6 @@
+
+
+zip_archive {
+  name: "readmes.zip",
+  files: ["**/*.md"]
+}

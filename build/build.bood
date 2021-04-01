@@ -14,7 +14,3 @@ go_binary {
     ]
 }
 
-//zip_archive {
-//  name: "arch1",
-//  files: ["**/*.go"]
-//}
