@@ -17,9 +17,9 @@ var (
 	}, "workDir", "outputPath", "pkg")
 
 	goTest = pctx.StaticRule("binaryTest", blueprint.RuleParams{
-		Command:     "cd $workDir && mkdir -p ${outputPath} && go test -v ${testPkg} > ${outputPath}/test.txt",
-		Description: "test go command $testPkg",
-	}, "workDir", "outputPath", "testPkg")
+		Command:     "cd $workDir && mkdir -p ${outputPath} && go test -v ${testPkgs} > ${outputPath}/test.log",
+		Description: "test go command $testPkgs",
+	}, "workDir", "outputPath", "testPkgs")
 
 	goVendor = pctx.StaticRule("vendor", blueprint.RuleParams{
 		Command:     "cd $workDir && go mod vendor",
@@ -35,7 +35,7 @@ type goTestedBinaryModuleType struct {
 		Srcs        []string
 		SrcsExclude []string
 
-		TestPkg         string
+		TestPkgs        []string
 		TestSrcs        []string
 		TestSrcsExclude []string
 
@@ -111,17 +111,21 @@ func (gtb *goTestedBinaryModuleType) GenerateBuildActions(ctx blueprint.ModuleCo
 	if inputErors {
 		return
 	}
-	ctx.Build(pctx, blueprint.BuildParams{
-		Description: "Test my module",
-		Rule:        goTest,
-		Outputs:     []string{testOutputPath},
-		Implicits:   inputs,
-		Args: map[string]string{
-			"outputPath": testOutputPath,
-			"workDir":    ctx.ModuleDir(),
-			"testPkg":    gtb.properties.TestPkg,
-		},
-	})
+
+	for i, pkg := range gtb.properties.TestPkgs {
+		outputPath := fmt.Sprintf("%s/test%d", testOutputPath, i)
+		ctx.Build(pctx, blueprint.BuildParams{
+			Description: fmt.Sprintf("Test module: %s", pkg),
+			Rule:        goTest,
+			Outputs:     []string{outputPath},
+			Implicits:   inputs,
+			Args: map[string]string{
+				"outputPath": outputPath,
+				"workDir":    ctx.ModuleDir(),
+				"testPkgs":   pkg,
+			},
+		})
+	}
 
 }
 

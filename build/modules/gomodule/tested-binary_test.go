@@ -15,12 +15,12 @@ func TestSimpleBinFactory(t *testing.T) {
 
 	ctx.MockFileSystem(map[string][]byte{
 		"Blueprints": []byte(`
-			go_tested_binary {
+			go_binary {
 			  name: "test-out",
 			  srcs: ["test-src.go"],
 			  testSrcs: ["test-src_test.go"],
 			  pkg: ".",
-			  testPkg: ".",
+			  testPkgs: ["."],
 	          vendorFirst: true
 			}
 		`),
@@ -28,7 +28,7 @@ func TestSimpleBinFactory(t *testing.T) {
 		"test-src_test.go": nil,
 	})
 
-	ctx.RegisterModuleType("go_tested_binary", gomodule.SimpleBinFactory)
+	ctx.RegisterModuleType("go_binary", gomodule.SimpleBinFactory)
 
 	cfg := bood.NewConfig()
 
