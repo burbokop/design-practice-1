@@ -15,7 +15,5 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key:
-    secure: "eccca810cd77cdf0dac104f82b83e29d781f4e1d"
   file: "./build/out/bin/bood"
   skip_cleanup: true
