@@ -4,6 +4,10 @@ go:
   - master
 
 
+before_install:
+  - sudo apt-get -y install ninja-build
+
+
 
 deploy:
   provider: script
