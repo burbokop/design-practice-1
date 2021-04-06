@@ -2,3 +2,11 @@ language: go
 
 go: 
   - master
+
+
+
+deploy:
+  provider: script
+  script: bash ./scripts/run.sh
+  on:
+    branch: master
