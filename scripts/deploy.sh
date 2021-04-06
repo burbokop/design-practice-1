@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Running deploy ..."
+pwd
+
 # build bood
 go build ./build/cmd/bood
 
