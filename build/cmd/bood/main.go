@@ -38,7 +38,6 @@ func main() {
 
 	if !*dryRun {
 		config.Info.Println("Starting the build now")
-
 		cmd := exec.Command("ninja", append([]string{"-f", ninjaBuildPath}, flag.Args()...)...)
 		cmd.Stdout = os.Stdout
 		cmd.Stdin = os.Stdin
