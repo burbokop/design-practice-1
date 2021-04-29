@@ -29,6 +29,7 @@ var (
 
 type goTestedBinaryModuleType struct {
 	blueprint.SimpleName
+	allovedTasks []string
 
 	properties struct {
 		Pkg         string
@@ -51,6 +52,21 @@ func (gtb *goTestedBinaryModuleType) DynamicDependencies(blueprint.DynamicDepend
 
 func (gtb *goTestedBinaryModuleType) GenerateBuildActions(ctx blueprint.ModuleContext) {
 	name := ctx.ModuleName()
+
+	// Exit if task not alloved
+	if len(gtb.allovedTasks) > 0 {
+		foundName := false
+		for _, t := range gtb.allovedTasks {
+			if name == t {
+				foundName = true
+				break
+			}
+		}
+		if !foundName {
+			return
+		}
+	}
+
 	config := bood.ExtractConfig(ctx)
 	config.Debug.Printf("Adding build actions for go binary module '%s'", name)
 
@@ -88,17 +104,19 @@ func (gtb *goTestedBinaryModuleType) GenerateBuildActions(ctx blueprint.ModuleCo
 		inputs = append(inputs, vendorDirPath)
 	}
 
-	ctx.Build(pctx, blueprint.BuildParams{
-		Description: fmt.Sprintf("Build %s as Go binary", name),
-		Rule:        goBuild,
-		Outputs:     []string{outputPath},
-		Implicits:   inputs,
-		Args: map[string]string{
-			"outputPath": outputPath,
-			"workDir":    ctx.ModuleDir(),
-			"pkg":        gtb.properties.Pkg,
-		},
-	})
+	if gtb.properties.Pkg != "" {
+		ctx.Build(pctx, blueprint.BuildParams{
+			Description: fmt.Sprintf("Build %s as Go binary", name),
+			Rule:        goBuild,
+			Outputs:     []string{outputPath},
+			Implicits:   inputs,
+			Args: map[string]string{
+				"outputPath": outputPath,
+				"workDir":    ctx.ModuleDir(),
+				"pkg":        gtb.properties.Pkg,
+			},
+		})
+	}
 
 	for _, testSrc := range gtb.properties.TestSrcs {
 		if matches, err := ctx.GlobWithDeps(testSrc, gtb.properties.TestSrcsExclude); err == nil {
@@ -129,7 +147,9 @@ func (gtb *goTestedBinaryModuleType) GenerateBuildActions(ctx blueprint.ModuleCo
 
 }
 
-func SimpleBinFactory() (blueprint.Module, []interface{}) {
-	mType := &goTestedBinaryModuleType{}
-	return mType, []interface{}{&mType.SimpleName.Properties, &mType.properties}
+func CreateSimpleBinFactory(allovedTasks []string) func() (blueprint.Module, []interface{}) {
+	return func() (blueprint.Module, []interface{}) {
+		mType := &goTestedBinaryModuleType{allovedTasks: allovedTasks}
+		return mType, []interface{}{&mType.SimpleName.Properties, &mType.properties}
+	}
 }

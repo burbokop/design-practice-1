@@ -28,7 +28,7 @@ func TestSimpleBinFactory(t *testing.T) {
 		"test-src_test.go": nil,
 	})
 
-	ctx.RegisterModuleType("go_binary", gomodule.SimpleBinFactory)
+	ctx.RegisterModuleType("go_binary", gomodule.CreateSimpleBinFactory([]string{}))
 
 	cfg := bood.NewConfig()
 

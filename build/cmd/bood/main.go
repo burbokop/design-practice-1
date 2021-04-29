@@ -16,11 +16,12 @@ import (
 var (
 	dryRun  = flag.Bool("dry-run", false, "Generate ninja build file but don't start the build")
 	verbose = flag.Bool("v", false, "Display debugging logs")
+	task    = flag.String("task", "", "Run specific task")
 )
 
-func NewContext() *blueprint.Context {
+func NewContext(allovedTasks []string) *blueprint.Context {
 	ctx := bood.PrepareContext()
-	ctx.RegisterModuleType("go_binary", gomodule.SimpleBinFactory)
+	ctx.RegisterModuleType("go_binary", gomodule.CreateSimpleBinFactory(allovedTasks))
 	ctx.RegisterModuleType("zip_archive", zip_archive.SimpleBinFactory)
 	return ctx
 }
@@ -32,7 +33,13 @@ func main() {
 	if !*verbose {
 		config.Debug = log.New(ioutil.Discard, "", 0)
 	}
-	ctx := NewContext()
+
+	tasks := []string{}
+	if *task != "" {
+		tasks = append(tasks, *task)
+	}
+
+	ctx := NewContext(tasks)
 
 	ninjaBuildPath := bood.GenerateBuildFile(config, ctx)
 
