@@ -35,6 +35,7 @@ type goTestedBinaryModuleType struct {
 		Pkg         string
 		Srcs        []string
 		SrcsExclude []string
+		ManualRun   bool
 
 		TestPkgs        []string
 		TestSrcs        []string
@@ -54,7 +55,7 @@ func (gtb *goTestedBinaryModuleType) GenerateBuildActions(ctx blueprint.ModuleCo
 	name := ctx.ModuleName()
 
 	// Exit if task not alloved
-	if len(gtb.allovedTasks) > 0 {
+	if len(gtb.allovedTasks) > 0 || gtb.properties.ManualRun {
 		foundName := false
 		for _, t := range gtb.allovedTasks {
 			if name == t {
